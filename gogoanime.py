@@ -56,6 +56,7 @@ class Gogoanime:
         try:
             response = requests.get(link, headers=self.headers)
         except requests.exceptions.MissingSchema as e:
+            print("It's going to sleep for 30s.")
             time.sleep(30)
             response = requests.get(link, headers=self.headers)
 
