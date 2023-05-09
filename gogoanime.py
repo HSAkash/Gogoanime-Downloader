@@ -139,7 +139,6 @@ class Gogoanime:
         link_dict = self.get_download_link_dict(response)
         # get download url
         url, quality = self.get_download_url(link_dict, quality)
-        print(f"Downloading {quality} quality video. url: {url}")
         if fileName is None:
             fileName = gogoanimeUrl.split("/")[-1]
             file_extension = url.split('.')[-1]
