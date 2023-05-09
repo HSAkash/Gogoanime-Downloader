@@ -7,6 +7,10 @@
 
 ## Setup
 Install python3 any version.[website](https://www.python.org/)
+### Clone repository
+```
+git clone git@github.com:HSAkash/Gogoanime-Downloader.git
+```
 ### Create environment
 ```
 python -m venv env
@@ -36,7 +40,7 @@ pip install -r requirements.txt
 ## Setup .env file
 gogoanime, auth get from browser cookie.
 <p>
-<img src='pic/gogoanime.png' width="600" height="350"/>
+<img src='pic/gogoanime.png'/>
 <p>
 After geting the environment variable then you can use the following steps to set the environment.
 Go to the .env file and configure the environment
@@ -49,12 +53,12 @@ auth=HSAkash
 ```
 python gogoanime.py
 ```
-details:
-Anime url: anime url from gogoanime site.
-Video Quality: 360, 480, 720, 1080
-Download Type:
-    1. Single Episode/ Video
-    2. Multiple Episodes/ Videos 
+details:<br>
+Anime url: anime url from gogoanime site.<br>
+Video Quality: 360, 480, 720, 1080<br>
+Download Type:<br>
+    1. Single Episode/ Video<br>
+    2. Multiple Episodes/ Videos <br>
 
-Episode from : Starting from
-Episode to : Ending Episode
+Episode from : Starting from<br>
+Episode to : Ending Episode<br>
