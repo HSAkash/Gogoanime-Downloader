@@ -1,0 +1,5 @@
+bs4
+decouple
+python-decouple
+requests
+tqdm
