@@ -20,12 +20,18 @@ class Gogoanime:
         """
         gogoanime = config("gogoanime")
         auth = config("auth")
-        User_Agent = config("User-Agent")
+        User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
+        Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
         self.headers.update(
             {
-                'Cookie': f'gogoanime={gogoanime}; auth=f{auth}',
-                'User-Agent': f'{User_Agent}',
+                'Host': 'gogoanime.cl',
+                'Cookie': f'gogoanime={gogoanime}; auth={auth}',
+                'User-Agent': User_Agent,
+                'Accept': Accept,
+                'Accept-Language': 'en-US,en;q=0.5',
+                'Accept-Encoding': 'gzip, deflate',
+                'Referer': 'https://gogoanime.cl/'
             }
         )
 
@@ -53,16 +59,19 @@ class Gogoanime:
             else:
                 raise Exception(f'Quality {quality} not found.')
         link = link_dict[quality]
-        try:
-            response = requests.get(link, headers=self.headers)
-        except requests.exceptions.MissingSchema as e:
-            print("It's going to sleep for 30s.")
-            time.sleep(30)
-            response = requests.get(link, headers=self.headers)
-
-        # get main download url
-        url = response.headers.get('location')
-        return url, quality
+        response = requests.head(link)
+        if response.headers.get('Location'):
+            return response.headers.get('Location') , quality
+        
+        # try:
+        #     response = requests.get(link)
+        # except requests.exceptions.MissingSchema as e:
+        #     print("It's going to sleep for 30s.")
+        #     time.sleep(30)
+        #     response = requests.get(link)
+        # # get main download url
+        # url = response.headers.get('location')
+        # return url, quality
     
     def download(self, url, fileName):
 
@@ -130,6 +139,7 @@ class Gogoanime:
         link_dict = self.get_download_link_dict(response)
         # get download url
         url, quality = self.get_download_url(link_dict, quality)
+        print(f"Downloading {quality} quality video. url: {url}")
         if fileName is None:
             fileName = gogoanimeUrl.split("/")[-1]
             file_extension = url.split('.')[-1]
