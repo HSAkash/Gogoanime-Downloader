@@ -169,5 +169,10 @@ if __name__ == '__main__':
                 url = f"{url_dict['web_site']}/{url_dict['anime_name']}-episode-{episode}"
                 downloader.start(url, quality=quality)
     except Exception as e:
-        print(f"Please try after some time.")
+        print(f"""
+        Please try after some time.
+        If you are getting this error again and again then please change your gogoanime and auth environment value.
+        Which is stored in .env file.
+        gogoanime, auth get from browser cookie.
+        """)
     
