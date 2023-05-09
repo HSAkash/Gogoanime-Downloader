@@ -1,4 +1,5 @@
 import os
+import time
 import requests
 from tqdm import tqdm
 from decouple import config
@@ -52,7 +53,11 @@ class Gogoanime:
             else:
                 raise Exception(f'Quality {quality} not found.')
         link = link_dict[quality]
-        response = requests.head(link)
+        try:
+            response = requests.get(link, headers=self.headers)
+        except requests.exceptions.MissingSchema as e:
+            time.sleep(30)
+            response = requests.get(link, headers=self.headers)
 
         # get main download url
         url = response.headers.get('location')
@@ -151,15 +156,18 @@ if __name__ == '__main__':
     2. Multiple Episodes/ Videos 
     """)
     download_type = int(input("Download Type: "))
-    if download_type == 1:
-        if "episode" not in url:
-            print(f"{url} not found")
-            exit()
-        downloader.start(url, quality=quality)
-    else:
-        ep_from = int(input('Episode from : '))
-        ep_to = int(input('Episode to : ')) + 1
-        for episode in range(ep_from, ep_to):
-            url = f"{url_dict['web_site']}/{url_dict['anime_name']}-episode-{episode}"
+    try:
+        if download_type == 1:
+            if "episode" not in url:
+                print(f"{url} not found")
+                exit()
             downloader.start(url, quality=quality)
+        else:
+            ep_from = int(input('Episode from : '))
+            ep_to = int(input('Episode to : ')) + 1
+            for episode in range(ep_from, ep_to):
+                url = f"{url_dict['web_site']}/{url_dict['anime_name']}-episode-{episode}"
+                downloader.start(url, quality=quality)
+    except Exception as e:
+        print(f"Please try after some time.")
     
