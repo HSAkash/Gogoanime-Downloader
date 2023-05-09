@@ -43,7 +43,8 @@ gogoanime, auth get from browser cookie.
 <img src='pic/gogoanime.png'/>
 <p>
 After geting the environment variable then you can use the following steps to set the environment.
-Go to the .env file and configure the environment
+Go to the .env file and configure the environment.
+
 ```
 gogoanime=gogoanime
 auth=HSAkash
