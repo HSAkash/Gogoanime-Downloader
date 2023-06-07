@@ -52,16 +52,16 @@ auth=HSAkash #your gogoanime session
 ```
 python gogoanime.py -h
 ```
-usage: gogoanime.py [-h] [-U URL] [-s START] [-n EPISODE] [-e END]
-                    [-q QUALITY] [-d DESTINATION]
-
-Description of program
-
-options:
-  -h, --help            show this help message and exit
-  -U URL, --url URL     url of the anime
-  -s START, --start START start episode
-  -n EPISODE, --episode EPISODE single episode number
-  -e END, --end END     end episode
-  -q QUALITY, --quality QUALITY video quality
-  -d DESTINATION, --destination DESTINATION destination folder
+usage: gogoanime.py [-h] [-U URL] [-s START] [-n EPISODE] [-e END]<br>
+                    [-q QUALITY] [-d DESTINATION]<br>
+<br>
+Description of program<br>
+<br>
+options:<br>
+  -h, --help            show this help message and exit<br>
+  -U URL, --url URL     url of the anime<br>
+  -s START, --start START start episode<br>
+  -n EPISODE, --episode EPISODE single episode number<br>
+  -e END, --end END     end episode<br>
+  -q QUALITY, --quality QUALITY video quality<br>
+  -d DESTINATION, --destination DESTINATION destination folder<br>
