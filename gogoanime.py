@@ -163,11 +163,12 @@ def download(downloader, url, fileName=None, quality='1080', anime_name=None):
             downloader.start(url, fileName=fileName, quality=quality, anime_name=anime_name)
             return
         except Exception as e:
+            i += 1
+            print(f"Error retrying {i}. Going to sleep for 10 seconds")
             if i > 5:
                 messagebox.showerror(title="Error", message=f"{e}")
                 exit()
-            time.sleep(30)
-            i += 1
+            time.sleep(10)
 
 
 
