@@ -2,9 +2,23 @@ import os
 import time
 import requests
 from tqdm import tqdm
-from decouple import config
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
+import tkinter as tk
+import argparse
+
+from urllib.parse import urlparse
+
+def is_valid_url(url):
+    try:
+        result = urlparse(url)
+        return all([result.scheme, result.netloc])
+    except ValueError:
+        return False
+    
+
+
+
 
 
 class Gogoanime:
@@ -18,8 +32,8 @@ class Gogoanime:
         Which is stored in .env file.
         gogoanime, auth get from browser cookie.
         """
-        gogoanime = config("gogoanime")
-        auth = config("auth")
+        gogoanime="gogoanime"
+        auth="HSAkash"
         User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
@@ -62,16 +76,7 @@ class Gogoanime:
         response = requests.head(link)
         if response.headers.get('Location'):
             return response.headers.get('Location') , quality
-        
-        # try:
-        #     response = requests.get(link)
-        # except requests.exceptions.MissingSchema as e:
-        #     print("It's going to sleep for 30s.")
-        #     time.sleep(30)
-        #     response = requests.get(link)
-        # # get main download url
-        # url = response.headers.get('location')
-        # return url, quality
+
     
     def download(self, url, fileName):
 
@@ -132,7 +137,7 @@ class Gogoanime:
             for future in as_completed(self.futures):
                 future.result()
 
-    def start(self, gogoanimeUrl, fileName=None, quality='1080'):
+    def start(self, gogoanimeUrl, fileName=None, quality='1080', anime_name=None):
         # authenicate user send request to gogoanime and get all download links
         response = requests.get(gogoanimeUrl, headers=self.headers)
         # get download link dict
@@ -143,46 +148,83 @@ class Gogoanime:
             fileName = gogoanimeUrl.split("/")[-1]
             file_extension = url.split('.')[-1]
             fileName = f"{fileName}-{quality}.{file_extension}"
+        if anime_name:
+            fileName = f"{anime_name}/{fileName}"
         try:
             self.download(url, fileName)
         except requests.exceptions.MissingSchema as e:
             print(f"Error: Please check your url: {gogoanimeUrl}")
 
 
-if __name__ == '__main__':
-    downloader = Gogoanime()
-    url = input("Anime url: ")
-    quality = input('Video Quality(360, 480, 720, 1080): ')
-    url_dict = {
-        'web_site': "/".join(url.split("/")[:3]),
-        "anime_name": url.split("/")[-1]
-    }
-    if "episode" in url_dict['anime_name']:
-        url_dict['anime_name'] = url_dict['anime_name'].split("-episode")[0]
-
-    print(f"""
-    Download Type:
-    1. Single Episode/ Video
-    2. Multiple Episodes/ Videos 
-    """)
-    download_type = int(input("Download Type: "))
-    try:
-        if download_type == 1:
-            if "episode" not in url:
-                print(f"{url} not found")
+def download(downloader, url, fileName=None, quality='1080', anime_name=None):
+    i = 0
+    while True:
+        try:
+            downloader.start(url, fileName=fileName, quality=quality, anime_name=anime_name)
+            return
+        except Exception as e:
+            if i > 5:
+                tk.messagebox.showerror(title="Error", message=f"{e}")
                 exit()
-            downloader.start(url, quality=quality)
-        else:
-            ep_from = int(input('Episode from : '))
-            ep_to = int(input('Episode to : ')) + 1
-            for episode in range(ep_from, ep_to):
-                url = f"{url_dict['web_site']}/{url_dict['anime_name']}-episode-{episode}"
-                downloader.start(url, quality=quality)
-    except Exception as e:
-        print(f"""
-        Please try after some time.
-        If you are getting this error again and again then please change your gogoanime and auth environment value.
-        Which is stored in .env file.
-        gogoanime, auth get from browser cookie.
-        """)
+            time.sleep(30)
+            i += 1
+
+
+
+
+def main():
+    # Create an argument parser
+    parser = argparse.ArgumentParser(description='Description of program')
+
+    # Add arguments to the parser
+    parser.add_argument('-U', '--url', type=str, help='url of the anime')
+    parser.add_argument('-s', '--start', type=int, help='start episode')
+    parser.add_argument('-n', '--episode', type=int, help='single episode number')
+    parser.add_argument('-e', '--end', type=int, help='end episode')
+    parser.add_argument('-q', '--quality', type=str, help='video quality')
+    parser.add_argument('-d', '--destination', type=str, help='destination folder')
+
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # Access the values of the arguments
+    url = args.url
+    start_episode = args.start
+    end_episode = args.end
+    quality = args.quality
+    destination = args.destination
+    signle_episode = args.episode
+
     
+    if is_valid_url(url):
+        downloader = Gogoanime()
+        web_site = "/".join(url.split("/")[:3])
+        anime_name = url.split("/")[-1].split("-episode")[0]
+
+        if not quality:
+            quality = '1080'
+        if not destination:
+                destination = anime_name
+        os.makedirs(destination, exist_ok=True)
+
+
+        if signle_episode:
+            url = f"{web_site}/{destination}-episode-{signle_episode}"
+            download(downloader, url, quality=quality, anime_name=destination)
+
+        elif not start_episode and not end_episode and 'episode' in url:
+            download(downloader, url, quality=quality, anime_name=destination)
+        else:
+            if not start_episode:
+                start_episode = 1
+            if not end_episode:
+                end_episode = start_episode + 12
+            for episode in range(start_episode, end_episode+1):
+                url = f"{web_site}/{destination}-episode-{episode}"
+                download(downloader, url, quality=quality, anime_name=destination)
+            
+
+
+if __name__ == '__main__':
+    main()
+    tk.messagebox.showinfo(title="Success", message="Download Complete")

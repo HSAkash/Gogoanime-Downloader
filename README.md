@@ -32,8 +32,6 @@ pip install -r requirements.txt
 <pre>
 │  
 ├─gogoanime.py
-│
-├─.env
 |
 </pre>
 
@@ -42,24 +40,28 @@ gogoanime, auth get from browser cookie.
 <p>
 <img src='pic/gogoanime.png'/>
 <p>
-After geting the environment variable then you can use the following steps to set the environment.
-Go to the .env file and configure the environment.
+After geting the session variable then you can use the following steps to set the session.
+Go to the Gogoanime class and header_setup function and configure the session.
 
 ```
-gogoanime=gogoanime
-auth=HSAkash
+gogoanime=gogoanime #your gogoanime session 
+auth=HSAkash #your gogoanime session 
 ```
 
 # Run the command
 ```
-python gogoanime.py
+python gogoanime.py -h
 ```
-details:<br>
-Anime url: anime url from gogoanime site.<br>
-Video Quality: 360, 480, 720, 1080<br>
-Download Type:<br>
-    1. Single Episode/ Video<br>
-    2. Multiple Episodes/ Videos <br>
+usage: gogoanime.py [-h] [-U URL] [-s START] [-n EPISODE] [-e END]
+                    [-q QUALITY] [-d DESTINATION]
 
-Episode from : Starting from<br>
-Episode to : Ending Episode<br>
+Description of program
+
+options:
+  -h, --help            show this help message and exit
+  -U URL, --url URL     url of the anime
+  -s START, --start START start episode
+  -n EPISODE, --episode EPISODE single episode number
+  -e END, --end END     end episode
+  -q QUALITY, --quality QUALITY video quality
+  -d DESTINATION, --destination DESTINATION destination folder
