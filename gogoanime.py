@@ -4,7 +4,7 @@ import requests
 from tqdm import tqdm
 from bs4 import BeautifulSoup
 from concurrent.futures import ThreadPoolExecutor, as_completed
-import tkinter as tk
+from tkinter import messagebox
 import argparse
 
 from urllib.parse import urlparse
@@ -32,8 +32,8 @@ class Gogoanime:
         Which is stored in .env file.
         gogoanime, auth get from browser cookie.
         """
-        gogoanime="gogoanime"
-        auth="HSAkash"
+        gogoanime="ip43gn1f2rpbeup911kq2d3lt7"
+        auth="y1aOssNcLDWwAqzI7Stl0vqNR1Y7d1ztM%2BlgL56erxhZW8cb5HPxDr4KQrBBeBcjJIOe2OFVCXRzuOdj6xHgvA%3D%3D"
         User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
@@ -164,7 +164,7 @@ def download(downloader, url, fileName=None, quality='1080', anime_name=None):
             return
         except Exception as e:
             if i > 5:
-                tk.messagebox.showerror(title="Error", message=f"{e}")
+                messagebox.showerror(title="Error", message=f"{e}")
                 exit()
             time.sleep(30)
             i += 1
@@ -227,4 +227,4 @@ def main():
 
 if __name__ == '__main__':
     main()
-    tk.messagebox.showinfo(title="Success", message="Download Complete")
+    messagebox.showinfo(title="Success", message="Download Complete")
