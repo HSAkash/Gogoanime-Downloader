@@ -39,13 +39,11 @@ class Gogoanime:
         self.headers = requests.utils.default_headers()
         self.headers.update(
             {
-                'Host': 'gogoanime.cl',
                 'Cookie': f'gogoanime={gogoanime}; auth={auth}',
                 'User-Agent': User_Agent,
                 'Accept': Accept,
                 'Accept-Language': 'en-US,en;q=0.5',
-                'Accept-Encoding': 'gzip, deflate',
-                'Referer': 'https://gogoanime.cl/'
+                'Accept-Encoding': 'gzip, deflate'
             }
         )
 
