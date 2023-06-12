@@ -32,8 +32,8 @@ class Gogoanime:
         Which is stored in .env file.
         gogoanime, auth get from browser cookie.
         """
-        gogoanime="ip43gn1f2rpbeup911kq2d3lt7"
-        auth="y1aOssNcLDWwAqzI7Stl0vqNR1Y7d1ztM%2BlgL56erxhZW8cb5HPxDr4KQrBBeBcjJIOe2OFVCXRzuOdj6xHgvA%3D%3D"
+        gogoanime="ip43gn1f2rpbeu"
+        auth="y1aOssNcLDWwAqzI7Stl0vqNR1Y7d1ztM%2BlgL56e"
         User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
