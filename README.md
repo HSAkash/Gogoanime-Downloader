@@ -52,15 +52,13 @@ auth=HSAkash #your gogoanime session
 ```
 python gogoanime.py -h
 ```
-usage: test.py [-h] [-s START] [-e END] [-q QUALITY] [-d DESTINATION]<br>
-               [--yes-playlist]<br>
-               url<br>
+usage: test.py [-h] [-s START] [-e END] [-q QUALITY] [-d DESTINATION] [--yes-playlist] url<br>
 <br>
 Description of program<br>
 <br>
 positional arguments:<br>
   url                   Url of the anime<br>
-
+<br>
 options:<br>
   -h, --help            show this help message and exit<br>
   -s START, --start START<br>
