@@ -261,7 +261,6 @@ def main():
     current_episode = start_episode
     while current_episode:
         url = f"{web_site}{current_episode}"
-        print(url)
         download(downloader, url, quality=quality, anime_name=destination)
         next_episode = get_next_episode(url)
         if not next_episode:
