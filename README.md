@@ -3,7 +3,7 @@
 ## Features
 * Single episode download
 * Multiple episode download
-* Resumeable
+* check already downloaded
 
 ## Setup
 Install python3 any version.[website](https://www.python.org/)
