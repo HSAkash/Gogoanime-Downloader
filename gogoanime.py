@@ -60,8 +60,8 @@ class Gogoanime:
         Which is stored in .env file.
         gogoanime, auth get from browser cookie.
         """
-        gogoanime="bbm4c1ohjm90oc"
-        auth="rtqbS1Vd%2FNRVlFpRP0N5ZoobhgSFViluOY1SVnGPJjU%3D%3D"
+        gogoanime="bbm4c87ck96"
+        auth="rtqbS4d%2FNRVlFpRP0N5ZoobhgSFVin5SVnGPJjU%3D%3D"
         User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
@@ -116,13 +116,12 @@ class Gogoanime:
         file_size = 0
         if os.path.exists(fileName):
             file_size = os.path.getsize(fileName)
-        if file_size > 0:
-            headers = {'Range': f'bytes={file_size}-'}
-            response = requests.get(url, headers=headers, stream=True)
-            mode = 'ab'
-        else:
-            response = requests.get(url, stream=True)
-            mode = 'wb'
+        if total_size == file_size:
+            print(f"File already downloaded: {fileName}")
+            return
+        file_size = 0
+        response = requests.get(url, stream=True)
+        mode = 'wb'
 
         # Download the file with progress bar and simultaneous requests
         print(f"{fileName}")
