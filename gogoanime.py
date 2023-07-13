@@ -26,7 +26,7 @@ def is_valid_anime_url(url):
     response = requests.get(url)
     bs4_object = BeautifulSoup(response.content, 'html.parser')
     result = bs4_object.find_all('h1', class_='entry-title')
-    if len(result)>0:
+    if result:
         return result[0].text != 'Error 404'
     return True
 
@@ -40,7 +40,7 @@ def get_next_episode(url):
     response = requests.get(url)
     bs4_object = BeautifulSoup(response.content, 'html.parser')
     next_episode = bs4_object.find_all('div', class_='anime_video_body_episodes_r')[0].find_all('a')
-    if bs4_object:
+    if next_episode:
         return next_episode[0].attrs['href']
     return
     
