@@ -52,16 +52,22 @@ auth=HSAkash #your gogoanime session
 ```
 python gogoanime.py -h
 ```
-usage: gogoanime.py [-h] [-U URL] [-s START] [-n EPISODE] [-e END]<br>
-                    [-q QUALITY] [-d DESTINATION]<br>
+usage: test.py [-h] [-s START] [-e END] [-q QUALITY] [-d DESTINATION]<br>
+               [--yes-playlist]<br>
+               url<br>
 <br>
 Description of program<br>
 <br>
+positional arguments:<br>
+  url                   Url of the anime<br>
+
 options:<br>
   -h, --help            show this help message and exit<br>
-  -U URL, --url URL     url of the anime<br>
-  -s START, --start START start episode<br>
-  -n EPISODE, --episode EPISODE single episode number<br>
+  -s START, --start START<br>
+                        start episode<br>
   -e END, --end END     end episode<br>
-  -q QUALITY, --quality QUALITY video quality<br>
-  -d DESTINATION, --destination DESTINATION destination folder<br>
+  -q QUALITY, --quality QUALITY<br>
+                        video quality<br>
+  -d DESTINATION, --destination DESTINATION<br>
+                        destination folder<br>
+  --yes-playlist        For playlist download<br>

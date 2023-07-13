@@ -1,4 +1,5 @@
 import os
+import sys
 import time
 import requests
 from tqdm import tqdm
@@ -8,6 +9,11 @@ from tkinter import messagebox
 import argparse
 
 from urllib.parse import urlparse
+import threading
+# Termination condition
+terminate = threading.Event()
+
+
 
 def is_valid_url(url):
     try:
@@ -15,6 +21,28 @@ def is_valid_url(url):
         return all([result.scheme, result.netloc])
     except ValueError:
         return False
+    
+def is_valid_anime_url(url):
+    response = requests.get(url)
+    bs4_object = BeautifulSoup(response.content, 'html.parser')
+    result = bs4_object.find_all('h1', class_='entry-title')
+    if result:
+        return result[0].text != 'Error 404'
+    return True
+
+def get_last_episode(url):
+    response = requests.get(url)
+    bs4_object = BeautifulSoup(response.content, 'html.parser')
+    last_episode = bs4_object.find_all('ul', id='episode_page')[0].find_all('a')[-1].text.strip().split('-')[-1]
+    return last_episode
+
+def get_next_episode(url):
+    response = requests.get(url)
+    bs4_object = BeautifulSoup(response.content, 'html.parser')
+    next_episode = bs4_object.find_all('div', class_='anime_video_body_episodes_r')[0].find_all('a')
+    if bs4_object:
+        return next_episode[0].attrs['href']
+    return
     
 
 
@@ -32,8 +60,8 @@ class Gogoanime:
         Which is stored in .env file.
         gogoanime, auth get from browser cookie.
         """
-        gogoanime="ip43gn1f2rpbeu"
-        auth="y1aOssNcLDWwAqzI7Stl0vqNR1Y7d1ztM%2BlgL56e"
+        gogoanime="bbm4c1ohjm90oc"
+        auth="rtqbS1Vd%2FNRVlFpRP0N5ZoobhgSFViluOY1SVnGPJjU%3D%3D"
         User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
@@ -176,12 +204,13 @@ def main():
     parser = argparse.ArgumentParser(description='Description of program')
 
     # Add arguments to the parser
-    parser.add_argument('-U', '--url', type=str, help='url of the anime')
-    parser.add_argument('-s', '--start', type=int, help='start episode')
-    parser.add_argument('-n', '--episode', type=int, help='single episode number')
-    parser.add_argument('-e', '--end', type=int, help='end episode')
+    parser.add_argument('-s', '--start', type=str, help='start episode')
+    parser.add_argument('-e', '--end', type=str, help='end episode')
     parser.add_argument('-q', '--quality', type=str, help='video quality')
     parser.add_argument('-d', '--destination', type=str, help='destination folder')
+    parser.add_argument('--yes-playlist', action='store_true', help='For playlist download')
+    parser.add_argument('url', help='Url of the anime')
+    
 
     # Parse the command-line arguments
     args = parser.parse_args()
@@ -192,38 +221,59 @@ def main():
     end_episode = args.end
     quality = args.quality
     destination = args.destination
-    signle_episode = args.episode
+    yes_playlist = args.yes_playlist
 
+    if not is_valid_url(url) or not is_valid_anime_url(url):
+        messagebox.showerror(title="Invalid link", message=f"{url}")
+        return
     
-    if is_valid_url(url):
-        downloader = Gogoanime()
-        web_site = "/".join(url.split("/")[:3])
-        anime_name = url.split("/")[-1].split("-episode")[0]
+    if not yes_playlist and 'episode' not in url:
+        messagebox.showwarning(title="Warning", message=f"Not category url:{url}\n Give episode url or type --yes-playlist for downloading playlist")
+        return
+    
+    web_site = "/".join(url.split("/")[:3])
+    anime_name = url.split("/")[-1].split("-episode")[0]
+    if not quality:
+        quality = '1080'
+    if not destination:
+            destination = anime_name
+    os.makedirs(destination, exist_ok=True)
 
-        if not quality:
-            quality = '1080'
-        if not destination:
-                destination = anime_name
-        os.makedirs(destination, exist_ok=True)
+    downloader = Gogoanime()
+
+    if not yes_playlist:
+        download(downloader, url, quality=quality, anime_name=destination)
+        messagebox.showinfo(title="Success", message="Download Complete")
+        return
+        
+    
+    if not start_episode:
+        start_episode = 1
+    if not end_episode:
+        end_episode = get_last_episode(f"{web_site}/category/{anime_name}")
+
+    start_episode = f"/{anime_name}-episode-{start_episode}"
+    end_episode = f"/{anime_name}-episode-{end_episode}"
 
 
-        if signle_episode:
-            url = f"{web_site}/{destination}-episode-{signle_episode}"
-            download(downloader, url, quality=quality, anime_name=destination)
+    # if signle_episode:
+    #     url = f"{web_site}/{destination}-episode-{signle_episode}"
+    #     download(downloader, url, quality=quality, anime_name=destination)
+    current_episode = start_episode
+    while current_episode:
+        url = f"{web_site}{current_episode}"
+        print(url)
+        download(downloader, url, quality=quality, anime_name=destination)
+        next_episode = get_next_episode(url)
+        if not next_episode:
+            break
+        if current_episode == end_episode:
+            break
+        current_episode = next_episode
 
-        elif not start_episode and not end_episode and 'episode' in url:
-            download(downloader, url, quality=quality, anime_name=destination)
-        else:
-            if not start_episode:
-                start_episode = 1
-            if not end_episode:
-                end_episode = start_episode + 12
-            for episode in range(start_episode, end_episode+1):
-                url = f"{web_site}/{destination}-episode-{episode}"
-                download(downloader, url, quality=quality, anime_name=destination)
-            
+
+    messagebox.showinfo(title="Success", message="Download Complete")
 
 
 if __name__ == '__main__':
     main()
-    messagebox.showinfo(title="Success", message="Download Complete")
