@@ -26,7 +26,7 @@ def is_valid_anime_url(url):
     response = requests.get(url)
     bs4_object = BeautifulSoup(response.content, 'html.parser')
     result = bs4_object.find_all('h1', class_='entry-title')
-    if result:
+    if len(result)>0:
         return result[0].text != 'Error 404'
     return True
 
