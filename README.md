@@ -69,5 +69,7 @@ options:
                         video quality
   -d DESTINATION, --destination DESTINATION
                         destination folder
+  -w WORKERS, --workers WORKERS
+                        Number of workers
   --yes-playlist        For playlist download
 ```
