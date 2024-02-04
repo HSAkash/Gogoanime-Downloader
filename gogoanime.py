@@ -207,6 +207,7 @@ def main():
     parser.add_argument('-e', '--end', type=str, help='end episode')
     parser.add_argument('-q', '--quality', type=str, help='video quality')
     parser.add_argument('-d', '--destination', type=str, help='destination folder')
+    parser.add_argument('-w', '--workers', type=int, default=6, help='Number of workers')
     parser.add_argument('--yes-playlist', action='store_true', help='For playlist download')
     parser.add_argument('url', help='Url of the anime')
     
@@ -220,6 +221,7 @@ def main():
     end_episode = args.end
     quality = args.quality
     destination = args.destination
+    workers = args.workers
     yes_playlist = args.yes_playlist
 
     if not is_valid_url(url) or not is_valid_anime_url(url):
@@ -238,7 +240,7 @@ def main():
             destination = anime_name
     os.makedirs(destination, exist_ok=True)
 
-    downloader = Gogoanime()
+    downloader = Gogoanime(max_workers=workers)
 
     if not yes_playlist:
         download(downloader, url, quality=quality, anime_name=destination)
