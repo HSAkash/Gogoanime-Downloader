@@ -10,6 +10,34 @@ import argparse
 
 from urllib.parse import urlparse
 import threading
+
+import os
+import signal
+import subprocess
+import sys
+from subprocess import Popen
+from typing import TypedDict
+
+
+class Win32PopenKwargs(TypedDict):
+    """Popen kwargs for Windows."""
+
+    creationflags: int
+
+
+class UnixPopenKwargs(TypedDict):
+    """Popen kwargs for Unix."""
+
+    start_new_session: bool
+
+
+popen_kwargs = (
+    UnixPopenKwargs(start_new_session=True)
+    if sys.platform != "win32"
+    else Win32PopenKwargs(creationflags=subprocess.CREATE_NEW_PROCESS_GROUP)
+)
+
+
 # Termination condition
 terminate = threading.Event()
 
@@ -50,9 +78,10 @@ def get_next_episode(url):
 
 
 class Gogoanime:
-    def __init__(self, max_workers=6):
+    def __init__(self, max_workers=6, aria2c = False):
         self.header_setup()
         self.max_workers = max_workers
+        self.aria2c = aria2c
 
     def header_setup(self):
         """
@@ -60,8 +89,8 @@ class Gogoanime:
         Which is stored in .env file.
         gogoanime, auth get from browser cookie.
         """
-        gogoanime="bbm4c87ck96"
-        auth="rtqbS4d%2FNRVlFpRP0N5ZoobhgSFVin5SVnGPJjU%3D%3D"
+        gogoanime="860as00fe2"
+        auth="clYZnlqfggxzidvT7mwg8RtG28QiYA2%4YxcKzg%3D%3D"
         User_Agent = "Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/112.0"
         Accept = "text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8"
         self.headers = requests.utils.default_headers()
@@ -162,6 +191,25 @@ class Gogoanime:
             for future in as_completed(self.futures):
                 future.result()
 
+    def aria2c_download(self, url, fileName):
+        if os.path.exists(fileName) and not os.path.exists(f"{fileName}.aria2"):
+            print(f"File already downloaded: {fileName}")
+            return
+        with Popen(args=("aria2c", "--enable-rpc"), **popen_kwargs) as p:
+            try:
+                print(f"{fileName}")
+                os.system(f'aria2c -x 16 -s 16 -k 1M -d . -o "{fileName}" "{url}"')
+            except KeyboardInterrupt as e:
+                print(e)
+                p.terminate()
+                raise e
+            finally:
+                # following code can shutdown the subprocess gracefully.
+                if sys.platform == "win32":
+                    os.kill(p.pid, signal.CTRL_BREAK_EVENT)
+                else:
+                    os.killpg(os.getpgid(p.pid), signal.SIGINT)
+
     def start(self, gogoanimeUrl, fileName=None, quality='1080', anime_name=None):
         # authenicate user send request to gogoanime and get all download links
         response = requests.get(gogoanimeUrl, headers=self.headers)
@@ -175,6 +223,9 @@ class Gogoanime:
             fileName = f"{fileName}-{quality}.{file_extension}"
         if anime_name:
             fileName = f"{anime_name}/{fileName}"
+        if self.aria2c:
+            self.aria2c_download(url, fileName)
+            return
         try:
             self.download(url, fileName)
         except requests.exceptions.MissingSchema as e:
@@ -208,6 +259,7 @@ def main():
     parser.add_argument('-q', '--quality', type=str, help='video quality')
     parser.add_argument('-d', '--destination', type=str, help='destination folder')
     parser.add_argument('-w', '--workers', type=int, default=6, help='Number of workers')
+    parser.add_argument('-a', '--aria', action='store_true', help='Use aria2c for download')
     parser.add_argument('--yes-playlist', action='store_true', help='For playlist download')
     parser.add_argument('url', help='Url of the anime')
     
@@ -223,6 +275,7 @@ def main():
     destination = args.destination
     workers = args.workers
     yes_playlist = args.yes_playlist
+    aria2c = args.aria
 
     if not is_valid_url(url) or not is_valid_anime_url(url):
         messagebox.showerror(title="Invalid link", message=f"{url}")
@@ -240,7 +293,7 @@ def main():
             destination = anime_name
     os.makedirs(destination, exist_ok=True)
 
-    downloader = Gogoanime(max_workers=workers)
+    downloader = Gogoanime(max_workers=workers, aria2c=aria2c)
 
     if not yes_playlist:
         download(downloader, url, quality=quality, anime_name=destination)
