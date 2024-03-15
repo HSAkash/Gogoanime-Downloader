@@ -1,3 +1,4 @@
+aria2
 bs4
 requests
 tqdm
